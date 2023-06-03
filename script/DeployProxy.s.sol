@@ -10,26 +10,26 @@ using { compile } for Vm;
 using { create, appendArg } for bytes;
 
 contract GasProfiler is Script {
-    address johnsProxy;
     address mySuperiorProxy;
 
     address impl;
+    uint256 deployerPrivateKey;
 
     function setUp() public {
+    
+        deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        address admin = vm.envAddress('WALLET_ADDRESS');
+        console.log(address(this));
+        console.log(admin);
+        vm.startBroadcast(deployerPrivateKey);
         impl = address(new CounterV1());
-        
-        johnsProxy = deployJohnsProxy(vm, impl);
-        mySuperiorProxy = deployProxy(vm, impl, address(this));
+        mySuperiorProxy = deployProxy(vm, impl, admin);
+        vm.stopBroadcast();
     }
 
     function run() public {
         uint256 gasBefore;
-        uint256 johnGasUsed;
         uint256 myGasUsed;
-
-        gasBefore = gasleft();
-        CounterV1(johnsProxy).increment();
-        johnGasUsed = gasBefore - gasleft();
 
         gasBefore = gasleft();
         CounterV1(mySuperiorProxy).increment();
@@ -37,10 +37,6 @@ contract GasProfiler is Script {
 
         console.log("CounterV1.increment gasProfiling");
         console.log("==============================");
-
-        console.log("Jtriley's proxy gas used: ");
-        console.log(johnGasUsed);
-        console.log("====");
         console.log("HP2 proxy gas used: ");
         console.log(myGasUsed);
     }
