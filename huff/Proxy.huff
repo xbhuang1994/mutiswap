@@ -4,7 +4,7 @@
 // https://github.com/jtriley-eth/minimum-viable-proxy/blob/main/huff/UUPSProxy.huff
 
 // uint256(keccak256("eip1967.proxy.admin"))
-#define constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6104
+#define constant ADMIN_SLOT = 0x77a8c28a1545a010fa5a903e4f63ee6d61ee884a426a2be638d0c8a13b83e278
 
 // Destroy function
 #define function destroy() nonpayable returns ()
