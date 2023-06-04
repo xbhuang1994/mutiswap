@@ -13,6 +13,8 @@ using { create, appendArg } for bytes;
 interface CounterV3 {
   function setValue(uint256) external;
   function getValue() external returns (uint256);
+  function getAdmin() external returns (address);
+  function custom(uint256,uint256) external returns (address);
 }
 contract ProxyTest is Test {
     address logic1;
@@ -28,7 +30,13 @@ contract ProxyTest is Test {
     }
 
     function testProxyBasics() public {
+        uint256 gasBefore;
+        uint256 johnGasUsed;
+        uint256 myGasUsed;
         address proxy = deployProxy(vm, logic1, address(this));
+        gasBefore = gasleft();
+        CounterV1(proxy).setNumber(1);
+        johnGasUsed = gasBefore - gasleft();
         uint256 _before = CounterV1(proxy).number();
         CounterV1(proxy).increment();
         uint256 _after = CounterV1(proxy).number();
@@ -36,14 +44,26 @@ contract ProxyTest is Test {
         console.log(CounterV1(proxy).version());
         IProxy(proxy).destroy();        
         proxy = deployProxy(vm, logic3, address(this));
-        CounterV3(proxy).setValue(1);
-        console.log(CounterV3(proxy).getValue());
+        CounterV3 v3 =  CounterV3(proxy);
+        gasBefore = gasleft();
+        // v3.setValue(1);
+        console.log(v3.custom(125,2),address(this));
+        myGasUsed = gasBefore - gasleft();
+        
+        console.log("CounterV1.increment gasProfiling");
+        console.log("==============================");
+
+        console.log("Jtriley's proxy gas used: ");
+        console.log(johnGasUsed);
+        console.log("====");
+        console.log("HP2 proxy gas used: ");
+        console.log(myGasUsed);
+        // console.log(CounterV3(proxy).getValue());
 
     }
 
     function testProxyOwnerDestroy() public {
         address proxy = deployProxy(vm, logic1, logic1);
-
         uint256 _before = CounterV1(proxy).number();
         CounterV1(proxy).increment();
         uint256 _after = CounterV1(proxy).number();

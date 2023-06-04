@@ -3,6 +3,8 @@
 #define function getValue() view returns (uint256)
 
 /* Storage Slots */
+#define constant ADMIN_SLOT = 0x77a8c28a1545a010fa5a903e4f63ee6d61ee884a426a2be638d0c8a13b83e278
+#define constant SWAPER = 0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38
 #define constant VALUE_LOCATION = FREE_STORAGE_POINTER()
 
 /* Methods */
@@ -23,18 +25,46 @@
     // Return value
     0x20 0x00 return
 }
+#define macro GET_ADMIN() = takes (0) returns (0){
+    [ADMIN_SLOT]
+    sload
+
+    0x00 mstore
+
+    0x20 0x00 return
+}
 
 #define macro MAIN() = takes (0) returns (0) {
-    // Identify which function is being called.
     0x00 calldataload 0xE0 shr
-    dup1 __FUNC_SIG(setValue) eq set jumpi
-    dup1 __FUNC_SIG(getValue) eq get jumpi
+    // 0x00 mstore
+    // 0x04 calldataload
+    // 0x24 calldataload
+    // [SWAPER]
+    origin
+    // callvalue
+    0x00 mstore
+    0x20 0x00 return
+    // msize
+    // msize calldataload
+    // 0xe0 shr
+    // dup1 0x33ab477d eq set jumpi
+    // 0x04 calldataload
+    // 0x200 0x00 mstore
+    // 0x20 0x00 return
 
-    0x00 0x00 revert
+    // set:
+    //     GET_ADMIN()
+    // GET_ADMIN()
+    // // Identify which function is being called.
+    // 0x00 calldataload 0xE0 shr
+    // dup1 __FUNC_SIG(setValue) eq set jumpi
+    // dup1 __FUNC_SIG(getValue) eq get jumpi
 
-    set:
-        SET_VALUE()
-    get:
-        GET_VALUE()
+    // 0x00 0x00 revert
+
+    // set:
+    //     SET_VALUE()
+    // get:
+    //     GET_VALUE()
 
 }
